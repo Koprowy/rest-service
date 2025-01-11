@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Aplikacja Spring Boot
+  app:
+    image: demoweb:latest    # Zmienna z nazwą obrazu Spring Boot (lub użyj "build" jeśli masz Dockerfile)
+    build: .
+    container_name: demo_app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/demo_db  # URL bazy danych
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "8080:8080"  # Mapping portów (localhost:8080 -> kontener:8080)
+    depends_on:
+      - db  # Aplikacja zależy od bazy danych
+    networks:
+      - demo_network
+
+  # Baza danych PostgreSQL
+  db:
+    image: postgres:13  # Obraz bazy danych PostgreSQL
+    container_name: demo_db
+    environment:
+      POSTGRES_DB: demo_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Używanie wolumenu do przechowywania danych bazy
+    networks:
+      - demo_network
+
+networks:
+  demo_network:  # Tworzenie wirtualnej sieci, na której będą działały kontenery
+    driver: bridge
+
+volumes:
+  db_data:  # Definicja wolumenu dla bazy danych
+
